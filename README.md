@@ -5,69 +5,59 @@
 **Lenguajes:** Scala, Java, Python
 
 ## Cómo ejecutar el código
-(lo llenas al final)
+
 
 ## Parte 1 – Explorar: la programación funcional en el mundo real
+## Parte 1 – Explorar: la programación funcional en el mundo real
 
-### Caso 1: Apache Spark (procesamiento de datos masivos)
+### ¿Dónde y para qué se usa la programación funcional fuera del aula?
 
-**Qué problema resuelve:** procesar conjuntos de datos enormes repartidos en
-muchas computadoras (por ejemplo, analizar logs de millones de líneas).
+Se usa sobre todo donde hay muchísimos datos o muchísimas peticiones al mismo tiempo: en el procesamiento de datos masivos (como Apache Spark) y en servicios con mucho tráfico (como los de Twitter). Sirve porque las funciones no modifican los datos originales, lo que facilita ejecutarlas en paralelo, y porque el código queda más corto: uno dice qué quiere hacer (filtrar, transformar) y no cómo recorrer los datos.
 
-**Lenguaje o herramienta:** Spark está escrito en Scala y ofrece APIs en
-Scala, Java, Python y R.
+### Caso 1: Apache Spark
 
-**Ventaja del enfoque funcional:** en lugar de programar cada paso a mano,
-uno le pasa funciones a operaciones como `filter`, `map` o `reduce` y Spark
-se encarga de repartir ese trabajo entre las máquinas. Además, como las
-funciones no modifican los datos originales ni tienen efectos secundarios,
-es más fácil ejecutarlas en paralelo sin que se estorben entre ellas.
+**Qué problema resuelve:** procesar conjuntos de datos enormes repartidos en muchas computadoras, por ejemplo analizar logs de millones de líneas.
 
-**Fuentes:**
-- OpenSourceForU, "Scala: The powerhouse of Apache Spark" (2017):
-  https://www.opensourceforu.com/2017/06/scala-powerhouse-apache-spark/
-- Towards Data Science, artículo "Why Functional Programming?" sobre Spark:
-  https://towardsdatascience.com/?p=169014
-- Diapositivas "The Spark Framework" (CWI, 2018), con ejemplos de lambdas en Spark:
-  https://event.cwi.nl/lsde/2018/slides/04-The%20Spark%20Framework.pdf
+**Lenguaje o herramienta:** Spark está escrito en Scala y tiene APIs en Scala, Java, Python y R.
 
-**Fragmento de código real:** ejemplo clásico de Spark para contar errores
-en un log (aparece en el artículo original de Spark y en material de clase):
+**Ventaja del enfoque funcional:** en vez de programar cada paso a mano, uno le pasa una función a operaciones como `map` o `filter` y Spark reparte ese trabajo entre las máquinas.
 
-    val file = spark.textFile("hdfs://...")
-    val errs = file.filter(_.contains("ERROR"))
-    val ones = errs.map(_ => 1)
-    val count = ones.reduce(_+_)
+**Ejemplo de código sencillo:** elevar al cuadrado cada número de un conjunto de datos de Spark (RDD). La idea viene de un libro sobre Spark en su versión de Python; yo la adapté a Scala:
 
-Qué hace: lee un archivo de log, se queda solo con las líneas que contienen
-"ERROR" (`filter` con la función anónima `_.contains("ERROR")`), convierte
-cada una en un 1 (`map` con `_ => 1`) y los suma (`reduce` con `_+_`).
-Las tres operaciones reciben funciones anónimas.
-Fuente: https://dmice.ohsu.edu/bedricks/courses/cs624/lecs/w2_lec2.pdf
+    // Python (del libro de Kane)
+    rdd.map(lambda x: x*x)
 
-### Caso 2: Twitter (servicios con millones de peticiones)
+    // Scala (adaptado)
+    val rdd = sc.parallelize(List(1, 2, 3, 4))
+    val cuadrados = rdd.map(x => x * x)
+    cuadrados.collect()   // Array(1, 4, 9, 16)
 
-**Qué problema resuelve:** soportar un crecimiento enorme de usuarios y
-peticiones. Twitter empezó con Ruby on Rails y empezó a tener problemas de
-escalabilidad y concurrencia.
+**Qué hace:** `sc.parallelize` crea un conjunto de datos con 1, 2, 3 y 4. Luego `map` aplica a cada elemento la función anónima `x => x * x`, que significa "dado un x, devuelve x por x". El resultado son los cuadrados: 1, 4, 9 y 16. La función anónima le dice a Spark qué hacer con cada elemento, y Spark se encarga de repartir el trabajo.
 
-**Lenguaje o herramienta:** pasaron sus servicios al JVM y usaron Scala
-(también Java). Crearon Finagle, una librería para servidores asíncronos
-escrita en Scala.
+### Caso 2: Twitter
 
-**Ventaja del enfoque funcional:** según las fuentes, eligieron Scala por ser
-un lenguaje de alto nivel, con tipado estático y funcional, que corre sobre
-el JVM. El cambio de plataforma les dio una mejora de rendimiento de más de
-10 veces y llegaron a manejar entre 10 000 y 20 000 peticiones por segundo
-por servidor.
-(Ojo: el motivo principal fue rendimiento y concurrencia; lo funcional fue
-una parte de la decisión.)
+**Qué problema resuelve:** aguantar un crecimiento enorme de usuarios y peticiones. Twitter empezó con Ruby on Rails, llegó a sus límites de concurrencia y movió sus servicios a la JVM.
 
-**Fuentes:**
-- InfoQ, "Scaling Twitter to New Peaks" (2013):
-  https://www.infoq.com/news/2013/08/scaling-twitter/
-- High Scalability, "Scaling Twitter: Making Twitter 10000 Percent Faster":
-  https://highscalability.com/scaling-twitter-making-twitter-10000-percent-faster/
+**Lenguaje o herramienta:** Scala (y Java) sobre la JVM. Crearon Finagle, una librería para servidores asíncronos escrita en Scala.
+
+**Ventaja del enfoque funcional:** Scala les gustó por ser de alto nivel, con tipado estático y funcional. Con el cambio de plataforma lograron más de 10 veces de mejora de rendimiento. (El motivo principal fue rendimiento y concurrencia; lo funcional fue parte de la decisión.)
+
+**Ejemplo de código real (documentación oficial de Finagle):** 
+
+    val f: Future[Array[Byte]] = fetchUrl(url).flatMap { bytes =>
+      val images = findImageUrls(bytes)
+      if (images.isEmpty)
+        Future.exception(new Exception("no image"))
+      else
+        fetchUrl(images.head)
+    }
+
+    f.onSuccess { image =>
+      println("Found image of size " + image.size)
+    }
+
+**Qué hace:** `fetchUrl` devuelve un `Future`, que es un valor que todavía no está listo porque la descarga tarda. El código dentro de `flatMap { bytes => ... }` es una función anónima que se ejecuta cuando la descarga termina: busca las imágenes y, si hay, descarga la primera. Después, `onSuccess { image => ... }` es otra función anónima que se ejecuta cuando todo salió bien e imprime el tamaño de la imagen. Así el programa no se queda esperando y puede atender otras peticiones, que es lo que necesita un servicio como Twitter.
+
 ## Parte 2 – Entender: ¿qué es una función anónima?
 ## Parte 3 – Aplicar: tipos de problemas
 ## Parte 4 – Ampliar: cuatro operaciones nuevas
