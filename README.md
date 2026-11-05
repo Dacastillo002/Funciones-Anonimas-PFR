@@ -7,6 +7,32 @@
 ## Cómo ejecutar el código
 
 
+Todos los comandos se ejecutan desde la carpeta del lenguaje correspondiente.
+
+**Python** (necesita Python 3):
+
+    cd python
+    python3 seleccion.py
+
+**Java** (necesita Java 16 o superior, por los `record`):
+
+    cd java
+    javac *.java
+    java Seleccion
+
+**Scala** (necesita `scala-cli`):
+
+    cd scala
+    scala-cli run Producto.scala Seleccion.scala
+
+En cada caso, `Seleccion` se cambia por `Transformacion`, `Validacion` o `Conteo` (en Python van en minúscula).
+
+**Operaciones nuevas (Parte 4)**, desde la carpeta `operaciones/`:
+
+    scala-cli run ../scala/Producto.scala SortBy.scala
+
+Se cambia `SortBy.scala` por `GroupBy.scala`, `Partition.scala`, `ZipWithIndex.scala` o `Combinacion.scala`.
+
 ## Parte 1 – Explorar: la programación funcional en el mundo real
 
 ### ¿Dónde y para qué se usa la programación funcional fuera del aula?
@@ -348,4 +374,66 @@ Para mostrar cuántos hay en cada grupo se usa `.length` sobre cada lista.
 Las funciones anónimas son la pieza que hace útiles a operaciones como `map`, `filter` o `groupBy`: la operación sabe *cómo* recorrer la lista, y la función anónima le dice *qué hacer* con cada elemento. Sin ellas habría que escribir un ciclo cada vez, o crear una función con nombre para cada condición pequeña. Con ellas, una pregunta como "¿qué productos cuestan más de $100?" se resuelve en una línea, y se pueden encadenar varias operaciones, como hice en la combinación de la Parte 4.
 
 Esto se ve en los casos que investigué. En Apache Spark, la función anónima `x => x * x` que se le pasa a `map` es lo que Spark reparte entre las máquinas para que cada una la aplique a su parte de los datos. En Twitter, con Finagle, las funciones anónimas dentro de `flatMap` y `onSuccess` indican qué hacer cuando una operación que tarda termina, y así el programa no se queda esperando. En los dos casos la idea es la misma que usé con mi lista de productos: separar *qué recorrer* de *qué hacer con cada elemento*.
+
 ## Referencias
+
+### Parte 1
+
+- OpenSourceForU. "Scala: The powerhouse of Apache Spark" (2017).
+  https://www.opensourceforu.com/2017/06/scala-powerhouse-apache-spark/
+- Towards Data Science. Artículo "Why Functional Programming?" sobre Spark.
+  https://towardsdatascience.com/?p=169014
+- CWI. "The Spark Framework" (diapositivas, 2018).
+  https://event.cwi.nl/lsde/2018/slides/04-The%20Spark%20Framework.pdf
+- Kane, F. *Taming Big Data with Apache Spark and Python*, sección "Map example".
+  https://m.cover.qq.com/read/1036701027/44
+- InfoQ. "Scaling Twitter to New Peaks" (2013).
+  https://www.infoq.com/news/2013/08/scaling-twitter/
+- High Scalability. "Scaling Twitter: Making Twitter 10000 Percent Faster".
+  https://highscalability.com/scaling-twitter-making-twitter-10000-percent-faster/
+- Finagle. "Concurrent Programming with Futures" (documentación oficial).
+  https://twitter.github.io/finagle/guide/Futures.html
+
+###  Parte 2
+
+- Educative. "How to use Python Lambda functions: a 5 minute tutorial" (origen del nombre lambda en el cálculo lambda de Alonzo Church).
+  https://educative.io/blog/python-lambda-functions-tutorial
+- Scala 3 Book. "Functions" (funciones anónimas y variables de función).
+  https://docs.scala-lang.org/scala3/book/fun-intro.html
+- Scala 3 Book. "Functions – Summary" (funciones como valores de primera clase y funciones de orden superior).
+  https://docs.scala-lang.org/scala3/book/fun-summary.html
+
+### Parte 3
+
+- Oracle. "Lambda Expressions", The Java Tutorials.
+  https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
+- Oracle. Java SE API, interfaz `Stream` (filter, map, anyMatch, allMatch, count, toList).
+  https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html
+- Python Software Foundation. "Functional Programming HOWTO".
+  https://docs.python.org/3/howto/functional.html
+- Alexander, A. "Scala collections classes and methods, organized by category".
+  https://alvinalexander.com/scala/scala-collections-classes-methods-organized-category
+
+### Parte 4
+
+- Alexander, A. "How to choose a Scala collection method to solve a problem" (sortBy, groupBy, partition, zipWithIndex).
+  https://alvinalexander.com/scala/how-to-choose-scala-collection-method-solve-problem-cookbook
+- Alexander, A. "Scala collections classes and methods, organized by category" (ejemplos de sortBy, partition, groupBy).
+  https://alvinalexander.com/scala/scala-collections-classes-methods-organized-category
+- Scala. Documentación oficial y API.
+  https://docs.scala-lang.org
+
+### Parte 5
+
+- Oracle. "Lambda Expressions", The Java Tutorials (variables capturadas por una lambda).
+  https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
+- ZetCode. "Variable Capture in Java Lambda Expressions" (variables final o *effectively final*).
+  https://zetcode.com/java/lambda-variable-capture/
+- Educative. "How to use Python Lambda functions: a 5 minute tutorial" (la lambda de Python solo admite una expresión).
+  https://educative.io/blog/python-lambda-functions-tutorial
+- Scala 3 Book. "Functions".
+  https://docs.scala-lang.org/scala3/book/fun-intro.html
+- Para la conclusión se usan los casos de Apache Spark y Twitter: ver Referencias Parte 1.
+
+(Herramienta de IA usada como apoyo para la redacción y el código: Claude, de Anthropic.)
+
