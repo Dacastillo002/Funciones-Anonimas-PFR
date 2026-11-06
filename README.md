@@ -6,32 +6,31 @@
 
 ## Cómo ejecutar el código
 
-
-Todos los comandos se ejecutan desde la carpeta del lenguaje correspondiente.
+Los datos de la tienda (12 productos) están al inicio de cada archivo, así que cada archivo se ejecuta solo. Los comandos se corren desde la carpeta correspondiente.
 
 **Python** (necesita Python 3):
 
     cd python
     python3 seleccion.py
 
-**Java** (necesita Java 16 o superior, por los `record`):
+**Java** (necesita Java 16 o superior):
 
     cd java
-    javac *.java
-    java Seleccion
+    java Seleccion.java
 
-**Scala** (necesita `scala-cli`):
+**Scala** (necesita `scala-cli`; los archivos `.sc` son scripts de Scala):
 
     cd scala
-    scala-cli run Producto.scala Seleccion.scala
+    scala-cli run Seleccion.sc
 
 En cada caso, `Seleccion` se cambia por `Transformacion`, `Validacion` o `Conteo` (en Python van en minúscula).
 
 **Operaciones nuevas (Parte 4)**, desde la carpeta `operaciones/`:
 
-    scala-cli run ../scala/Producto.scala SortBy.scala
+    cd operaciones
+    scala-cli run SortBy.sc
 
-Se cambia `SortBy.scala` por `GroupBy.scala`, `Partition.scala`, `ZipWithIndex.scala` o `Combinacion.scala`.
+Se cambia `SortBy.sc` por `GroupBy.sc`, `Partition.sc`, `ZipWithIndex.sc` o `Combinacion.sc`.
 
 ## Parte 1 – Explorar: la programación funcional en el mundo real
 
@@ -137,20 +136,20 @@ Cuando `crearSumador` termina, su parámetro `n` ya no existe, pero la función 
 
 ## Parte 3 – Aplicar: ¿en qué problemas sirven las funciones anónimas?
 
-Para todos los ejemplos uso la misma lista de 12 productos (nombre, categoría, precio y stock), definida en `scala/Producto.scala`, `java/Datos.java` y `python/producto.py`. El código completo de cada ejemplo está en las carpetas `scala/`, `java/` y `python/`; aquí muestro solo la parte donde aparece la función anónima.
+Para todos los ejemplos uso la misma lista de 12 productos (nombre, categoría, precio y stock). Los datos están al inicio de cada archivo y el código completo está en las carpetas `scala/`, `java/` y `python/`. Aquí muestro solo la parte donde aparece la función anónima.
 
 ### 3.1 Selección (`filter`)
 
 **Situación real:** una tienda quiere ver qué productos cuestan más de $100.
 
     // Scala
-    Datos.productos.filter(p => p.precio > 100)
+    productos.filter(p => p.precio > 100)
 
     // Java
-    Datos.PRODUCTOS.stream().filter(p -> p.precio() > 100).toList()
+    productos.stream().filter(p -> p.precio > 100).toList()
 
     // Python
-    list(filter(lambda p: p.precio > 100, PRODUCTOS))
+    list(filter(lambda p: p.precio > 100, productos))
 
 **Salida (igual en los tres):**
 
@@ -159,20 +158,22 @@ Para todos los ejemplos uso la misma lista de 12 productos (nombre, categoría, 
       Monitor - 220.0
       Escritorio - 180.0
 
-![Ejecución selección](img/seleccion.png)
+![Scala](img/scala_Seleccion.png)
+![Java](img/java_seleccion.png)
+![Python](img/python_Seleccion.png)
 
 ### 3.2 Transformación (`map`)
 
 **Situación real:** la tienda quiere saber cuánto dinero tiene en inventario de cada producto (precio por stock).
 
     // Scala
-    Datos.productos.map(p => (p.nombre, p.precio * p.stock))
+    productos.map(p => p.nombre + ": " + p.precio * p.stock)
 
     // Java
-    Datos.PRODUCTOS.stream().map(p -> p.nombre() + ": " + (p.precio() * p.stock())).toList()
+    productos.stream().map(p -> p.nombre + ": " + (p.precio * p.stock)).toList()
 
     // Python
-    list(map(lambda p: (p.nombre, p.precio * p.stock), PRODUCTOS))
+    list(map(lambda p: p.nombre + ": " + str(p.precio * p.stock), productos))
 
 **Salida (igual en los tres):**
 
@@ -190,23 +191,25 @@ Para todos los ejemplos uso la misma lista de 12 productos (nombre, categoría, 
       Mochila: 720.0
       Botella: 440.0
 
-![Ejecución transformación](img/transformacion.png)
+![Scala](img/scala_Transformacion.png)
+![Java](img/java_transformacion.png)
+![Python](img/python_transformacion.png)
 
 ### 3.3 Validación (`exists`, `forall`)
 
 **Situación real:** antes de hacer un pedido, la tienda revisa el estado de su inventario: si hay algo con poco stock y si todo está en orden.
 
     // Scala
-    Datos.productos.exists(p => p.stock < 10)
-    Datos.productos.forall(p => p.precio > 0)
+    productos.exists(p => p.stock < 10)
+    productos.forall(p => p.precio > 0)
 
     // Java
-    Datos.PRODUCTOS.stream().anyMatch(p -> p.stock() < 10)
-    Datos.PRODUCTOS.stream().allMatch(p -> p.precio() > 0)
+    productos.stream().anyMatch(p -> p.stock < 10)
+    productos.stream().allMatch(p -> p.precio > 0)
 
     // Python
-    any(map(lambda p: p.stock < 10, PRODUCTOS))
-    all(map(lambda p: p.precio > 0, PRODUCTOS))
+    any(map(lambda p: p.stock < 10, productos))
+    all(map(lambda p: p.precio > 0, productos))
 
 **Salida (igual en los tres):**
 
@@ -214,31 +217,35 @@ Para todos los ejemplos uso la misma lista de 12 productos (nombre, categoría, 
     ¿Todos los productos tienen precio mayor a 0? true
     ¿Todos los productos tienen stock mayor a 10? false
 
-![Ejecución validación](img/validacion.png)
+![Scala](img/scala_validacion.png)
+![Java](img/java_Validacion.png)
+![Python](img/python_validacion.png)
 
 ### 3.4 Conteo (`count`)
 
 **Situación real:** la tienda quiere saber cuántos productos son de tecnología y cuántos tienen poco stock.
 
     // Scala
-    Datos.productos.count(p => p.categoria == "Tecnología")
+    productos.count(p => p.categoria == "Tecnología")
 
     // Java
-    Datos.PRODUCTOS.stream().filter(p -> p.categoria().equals("Tecnología")).count()
+    productos.stream().filter(p -> p.categoria.equals("Tecnología")).count()
 
     // Python
-    len(list(filter(lambda p: p.categoria == "Tecnología", PRODUCTOS)))
+    len(list(filter(lambda p: p.categoria == "Tecnología", productos)))
 
 **Salida (igual en los tres):**
 
     Productos de Tecnología: 4
     Productos con stock menor a 20: 5
 
-![Ejecución conteo](img/conteo.png)
+![Scala](img/scala_conteo.png)
+![Java](img/java_conteo.png)
+![Python](img/python_conteo.png)
 
 ## Parte 4 – Ampliar: cuatro operaciones nuevas
 
-Además de las operaciones vistas en clase, investigué cuatro más: `sortBy`, `groupBy`, `partition` y `zipWithIndex`. Todas usan la misma lista de productos de la Parte 3 y el código está en la carpeta `operaciones/`.
+Además de las operaciones vistas en clase, investigué cuatro más: `sortBy`, `groupBy`, `partition` y `zipWithIndex`. Todas usan la misma lista de productos de la Parte 3, con los datos al inicio de cada archivo. El código está en la carpeta `operaciones/`.
 
 ### Ficha 1: `sortBy`
 
@@ -248,45 +255,52 @@ Además de las operaciones vistas en clase, investigué cuatro más: `sortBy`, `
 
 **Ejemplo en Scala:**
 
-    Datos.productos.sortBy(p => p.precio)
+    productos.sortBy(p => p.precio)
 
 **Salida:**
 
-    Esfero - 0.5
-    Carpeta - 1.75
-    Cuaderno - 2.5
-    Botella - 8.0
-    Mouse - 15.5
-    Lámpara - 25.0
-    Teclado - 35.0
-    Mochila - 40.0
-    Silla - 95.0
-    Escritorio - 180.0
-    Monitor - 220.0
-    Laptop - 850.0
+    Productos ordenados por precio (menor a mayor):
+      Esfero - 0.5
+      Carpeta - 1.75
+      Cuaderno - 2.5
+      Botella - 8.0
+      Mouse - 15.5
+      Lámpara - 25.0
+      Teclado - 35.0
+      Mochila - 40.0
+      Silla - 95.0
+      Escritorio - 180.0
+      Monitor - 220.0
+      Laptop - 850.0
 
 (Para ordenar de mayor a menor se cambia el signo: `sortBy(p => -p.precio)`.)
+
+![sortBy](img/Operacion_SortBy.png)
 
 **Problema que resuelve:** una tienda quiere ver su catálogo del producto más barato al más caro. Se parece al tipo *Extremos* (`maxBy`, `minBy`), pero en lugar de dar solo el mejor o el peor, ordena todos.
 
 ### Ficha 2: `groupBy`
 
-**Qué hace:** separa los elementos en grupos según una característica y devuelve un `Map` donde cada clave es un grupo.
+**Qué hace:** separa los elementos en grupos según una característica y devuelve un `Map`, donde cada categoría apunta a la lista de sus productos.
 
 **Función anónima:** recibe un producto y devuelve la clave del grupo al que pertenece (por ejemplo, su categoría).
 
 **Ejemplo en Scala:**
 
-    Datos.productos.groupBy(p => p.categoria)
+    val porCategoria = productos.groupBy(p => p.categoria)
+    porCategoria("Muebles").length
 
-Para mostrar cuántos hay en cada grupo se usa `.length` sobre cada lista.
+`porCategoria("Muebles")` es la lista de los productos de esa categoría, y `.length` los cuenta.
 
 **Salida:**
 
-    Accesorios: 2
-    Muebles: 3
-    Papelería: 3
-    Tecnología: 4
+    Cantidad de productos por categoría:
+      Accesorios: 2
+      Muebles: 3
+      Papelería: 3
+      Tecnología: 4
+
+![groupBy](img/Operacion_GroupBy.png)
 
 **Problema que resuelve:** la tienda quiere saber cuántos productos tiene por categoría. Es un tipo de problema **nuevo**, que podría llamarse *Agrupamiento*, porque los de la tabla 3.1 no separan la lista en varios grupos a la vez.
 
@@ -294,16 +308,20 @@ Para mostrar cuántos hay en cada grupo se usa `.length` sobre cada lista.
 
 **Qué hace:** divide una lista en dos: los elementos que cumplen una condición y los que no, en un solo paso.
 
-**Función anónima:** recibe un producto y devuelve un `Boolean`. El resultado es una tupla con dos listas: primero los que dieron `true` y luego los que dieron `false`.
+**Función anónima:** recibe un producto y devuelve un `Boolean`. El resultado es un par de listas: la primera con los que dieron `true` y la segunda con los que dieron `false`.
 
 **Ejemplo en Scala:**
 
-    val (stockBajo, stockSuficiente) = Datos.productos.partition(p => p.stock < 20)
+    val partes = productos.partition(p => p.stock < 20)
+
+`partes._1` es la primera lista (stock bajo) y `partes._2` la segunda (stock suficiente). Con `._1` y `._2` se accede al primer y al segundo elemento de un par.
 
 **Salida:**
 
-    Stock bajo (menor a 20): Laptop, Monitor, Silla, Escritorio, Mochila
-    Stock suficiente: Mouse, Teclado, Cuaderno, Esfero, Carpeta, Lámpara, Botella
+    Stock bajo (menor a 20): List(Laptop, Monitor, Silla, Escritorio, Mochila)
+    Stock suficiente: List(Mouse, Teclado, Cuaderno, Esfero, Carpeta, Lámpara, Botella)
+
+![partition](img/Operacion_Partition.png)
 
 **Problema que resuelve:** la tienda quiere separar los productos con poco stock de los que tienen suficiente. Se parece al tipo *Selección* (`filter`), con la diferencia de que `filter` solo te deja los que cumplen y `partition` conserva también los que no.
 
@@ -315,16 +333,19 @@ Para mostrar cuántos hay en cada grupo se usa `.length` sobre cada lista.
 
 **Ejemplo en Scala (con `filter` y `foreach`):**
 
-    Datos.productos
-      .filter(p => p.categoria == "Muebles")
-      .zipWithIndex
-      .foreach { case (p, i) => println(s"${i + 1}. ${p.nombre} - ${p.precio}") }
+    val muebles = productos.filter(p => p.categoria == "Muebles")
+    muebles.zipWithIndex.foreach(par => println((par._2 + 1) + ". " + par._1.nombre + " - " + par._1.precio))
+
+Aquí `par` es el par (producto, posición): `par._1` es el producto y `par._2` su posición. Se suma 1 para que la numeración empiece en 1.
 
 **Salida:**
 
-    1. Silla - 95.0
-    2. Escritorio - 180.0
-    3. Lámpara - 25.0
+    Muebles numerados:
+      1. Silla - 95.0
+      2. Escritorio - 180.0
+      3. Lámpara - 25.0
+
+![zipWithIndex](img/Operacion_ZipWithIndex.png)
 
 **Problema que resuelve:** la tienda quiere una lista numerada de los muebles que vende. Es un tipo de problema **nuevo**: *Enumeración* (numerar o usar la posición de cada elemento).
 
@@ -334,24 +355,27 @@ Para mostrar cuántos hay en cada grupo se usa `.length` sobre cada lista.
 
 **Cadena de operaciones:**
 
-    Datos.productos
+    productos
       .groupBy(p => p.categoria)
-      .map { case (cat, ps) => (cat, ps.foldLeft(0)((acc, p) => acc + p.stock)) }
-      .filter { case (_, total) => total > 60 }
+      .map(par => (par._1, par._2.foldLeft(0)((acc, p) => acc + p.stock)))
+      .filter(par => par._2 > 60)
       .toList
-      .sortBy { case (_, total) => -total }
+      .sortBy(par => -par._2)
 
 **Salida:**
 
-    Papelería: 500
-    Tecnología: 85
-    Accesorios: 73
+    Categorías con más de 60 unidades en stock (de mayor a menor):
+      Papelería: 500
+      Tecnología: 85
+      Accesorios: 73
 
 **Qué hace cada paso:**
 1. `groupBy` (nueva): agrupa los productos por categoría.
-2. `map` con `foldLeft` (vistas en clase): para cada categoría suma el stock de sus productos con `foldLeft`, y deja un par (categoría, stock total).
+2. `map` con `foldLeft` (vistas en clase): para cada categoría suma el stock de sus productos con `foldLeft`. Aquí `par` es la pareja (categoría, lista de productos), por eso `par._1` es la categoría y `par._2` la lista. Queda un par (categoría, stock total).
 3. `filter` (vista en clase): se queda solo con las categorías cuyo total es mayor a 60. Muebles (46) queda fuera.
-4. `sortBy` (nueva): ordena de mayor a menor stock. Se usa `-total` para invertir el orden.
+4. `sortBy` (nueva): ordena de mayor a menor stock. Se usa `-par._2` para invertir el orden.
+
+![combinación](img/Operacion_Combinacion.png)
 
 ## Parte 5 – Comparar y concluir
 
@@ -359,7 +383,7 @@ Para mostrar cuántos hay en cada grupo se usa `.length` sobre cada lista.
 
 | Criterio | Scala | Java | Python |
 |---|---|---|---|
-| Sintaxis de la lambda | `p => p.precio > 100` | `p -> p.precio() > 100` | `lambda p: p.precio > 100` |
+| Sintaxis de la lambda | `p => p.precio > 100` | `p -> p.precio > 100` | `lambda p: p.precio > 100` |
 | Cómo se declara el tipo | Se infiere solo; se puede escribir `(p: Producto) => ...` | Se infiere por el contexto del stream; se puede escribir `(Producto p) -> ...` | No se declara, el tipo es dinámico |
 | Operaciones con listas disponibles | Están directo en la lista: `filter`, `map`, `exists`, `forall`, `count` | Hay que pasar por `.stream()` y al final volver a lista con `.toList()` | Funciones sueltas: `filter`, `map`, `any`, `all`, `len`; no son métodos de la lista |
 | Restricción del lenguaje | Casi ninguna para lo que usé | Solo puede usar variables locales que no cambian (*effectively final*) | La lambda solo puede tener una expresión, no varias líneas |
