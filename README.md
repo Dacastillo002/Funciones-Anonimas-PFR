@@ -321,7 +321,7 @@ Además de las operaciones vistas en clase, investigué cuatro más: `sortBy`, `
     Stock bajo (menor a 20): List(Laptop, Monitor, Silla, Escritorio, Mochila)
     Stock suficiente: List(Mouse, Teclado, Cuaderno, Esfero, Carpeta, Lámpara, Botella)
 
-![partition](img/Operacion_Partition.png)
+![partition](img/Operacion_Partitition.png)
 
 **Problema que resuelve:** la tienda quiere separar los productos con poco stock de los que tienen suficiente. Se parece al tipo *Selección* (`filter`), con la diferencia de que `filter` solo te deja los que cumplen y `partition` conserva también los que no.
 
@@ -375,7 +375,7 @@ Aquí `par` es el par (producto, posición): `par._1` es el producto y `par._2` 
 3. `filter` (vista en clase): se queda solo con las categorías cuyo total es mayor a 60. Muebles (46) queda fuera.
 4. `sortBy` (nueva): ordena de mayor a menor stock. Se usa `-par._2` para invertir el orden.
 
-![combinación](img/Operacion_Combinacion.png)
+![combinación](img/operacion_Combinacion.png)
 
 ## Parte 5 – Comparar y concluir
 
