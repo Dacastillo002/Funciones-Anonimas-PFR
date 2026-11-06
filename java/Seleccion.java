@@ -4,12 +4,39 @@ import java.util.List;
 // Situación: una tienda quiere ver qué productos cuestan más de $100.
 public class Seleccion {
     public static void main(String[] args) {
-        // La lambda  p -> p.precio() > 100  devuelve true o false por cada producto
-        List<Producto> caros = Datos.PRODUCTOS.stream()
-                .filter(p -> p.precio() > 100)
-                .toList();
+        List<Producto> productos = List.of(
+            new Producto("Laptop", "Tecnología", 850.0, 8),
+            new Producto("Mouse", "Tecnología", 15.5, 40),
+            new Producto("Teclado", "Tecnología", 35.0, 25),
+            new Producto("Monitor", "Tecnología", 220.0, 12),
+            new Producto("Cuaderno", "Papelería", 2.5, 120),
+            new Producto("Esfero", "Papelería", 0.5, 300),
+            new Producto("Carpeta", "Papelería", 1.75, 80),
+            new Producto("Silla", "Muebles", 95.0, 10),
+            new Producto("Escritorio", "Muebles", 180.0, 6),
+            new Producto("Lámpara", "Muebles", 25.0, 30),
+            new Producto("Mochila", "Accesorios", 40.0, 18),
+            new Producto("Botella", "Accesorios", 8.0, 55)
+        );
+
+        List<Producto> caros = productos.stream().filter(p -> p.precio > 100).toList();
 
         System.out.println("Productos con precio mayor a $100:");
-        caros.forEach(p -> System.out.println("  " + p.nombre() + " - " + p.precio()));
+        caros.forEach(p -> System.out.println("  " + p.nombre + " - " + p.precio));
+    }
+}
+
+// Clase Producto (va después de la clase principal para poder correr el archivo directo)
+class Producto {
+    String nombre;
+    String categoria;
+    double precio;
+    int stock;
+
+    Producto(String nombre, String categoria, double precio, int stock) {
+        this.nombre = nombre;
+        this.categoria = categoria;
+        this.precio = precio;
+        this.stock = stock;
     }
 }
